@@ -42,4 +42,18 @@ public class BoardController {
         model.addAttribute("boardDto", boardDto);
         return "board/detail.html";
     }
+
+    @GetMapping("/post/edit/{no}")
+    public String edit(@PathVariable("no") Long id, Model model) {
+        BoardDto boardDto = boardService.getPost(id);
+
+        model.addAttribute("boardDto", boardDto);
+        return "board/update.html";
+    }
+
+    @PutMapping("/post/edit/{no}")
+    public String update(BoardDto boardDto){
+        boardService.savePost(boardDto);
+        return "redirect:/";
+    }
 }
