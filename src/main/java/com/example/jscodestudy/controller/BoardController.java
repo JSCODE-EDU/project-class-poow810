@@ -3,8 +3,10 @@ package com.example.jscodestudy.controller;
 import com.example.jscodestudy.dto.BoardDto;
 import com.example.jscodestudy.service.BoardService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Controller
 public class BoardController {
@@ -16,7 +18,9 @@ public class BoardController {
     }
 
     @GetMapping("/")
-    public String list() {
+    public String list(Model model) {
+        List<BoardDto> boardDtoList = boardService.getBoardlist();
+        model.addAttribute("boardList", boardDtoList);
         return "board/list.html";
     }
 
@@ -27,6 +31,28 @@ public class BoardController {
 
     @PostMapping("/post")
     public String write(BoardDto boardDto) {
+        boardService.savePost(boardDto);
+        return "redirect:/";
+    }
+
+    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET})
+    public String detail(@PathVariable("no") Long id, Model model) {
+        BoardDto boardDto = boardService.getPost(id);
+
+        model.addAttribute("boardDto", boardDto);
+        return "board/detail.html";
+    }
+
+    @GetMapping("/post/edit/{no}")
+    public String edit(@PathVariable("no") Long id, Model model) {
+        BoardDto boardDto = boardService.getPost(id);
+
+        model.addAttribute("boardDto", boardDto);
+        return "board/update.html";
+    }
+
+    @PutMapping("/post/edit/{no}")
+    public String update(BoardDto boardDto){
         boardService.savePost(boardDto);
         return "redirect:/";
     }
