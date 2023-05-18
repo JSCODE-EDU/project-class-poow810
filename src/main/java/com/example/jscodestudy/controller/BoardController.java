@@ -56,4 +56,19 @@ public class BoardController {
         boardService.savePost(boardDto);
         return "redirect:/";
     }
+
+    @DeleteMapping("/post/{no}")
+    public String delete(@PathVariable("no") Long id) {
+        boardService.deletePost(id);
+
+        return "redirect:/";
+    }
+
+    @GetMapping("/board/search")
+    public String search(@RequestParam(value = "keyword") String keyword, Model model) {
+        List<BoardDto> boardDtoList = boardService.searchPosts(keyword);
+        model.addAttribute("boardList", boardDtoList);
+
+        return "board/list.html";
+    }
 }
