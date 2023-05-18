@@ -43,6 +43,7 @@ public class BoardService {
         return boardDtoList;
     }
 
+    @Transactional
     public BoardDto getPost(Long id) {
         Optional<Board> boardWrapper = boardRepository.findById(id);
         Board board = boardWrapper.get();
@@ -56,5 +57,9 @@ public class BoardService {
                 .build();
 
         return boardDto;
+    }
+
+    public void deletePost(Long id) {
+        boardRepository.deleteById(id);
     }
 }
