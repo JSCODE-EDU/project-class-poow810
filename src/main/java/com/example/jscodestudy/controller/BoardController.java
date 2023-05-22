@@ -35,7 +35,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET})
+    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET}) //@GetMapping 오류
     public String detail(@PathVariable("no") Long id, Model model) {
         BoardDto boardDto = boardService.getPost(id);
 
