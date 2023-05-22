@@ -18,8 +18,11 @@ public class BoardController {
     }
 
     @GetMapping("/")
-    public String list(Model model) {
-        List<BoardDto> boardDtoList = boardService.getBoardlist();
+    public String list(Model model, @RequestParam(value="page", defaultValue = "1") Integer pageNum) {
+        List<BoardDto> boardDtoList = boardService.getBoardlist(pageNum);
+        Integer[] pageList = boardService.getPageList(pageNum);
+
+        model.addAttribute("pageList", pageList);
         model.addAttribute("boardList", boardDtoList);
         return "board/list.html";
     }
@@ -35,7 +38,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET}) //@GetMapping 오류
+    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET})
     public String detail(@PathVariable("no") Long id, Model model) {
         BoardDto boardDto = boardService.getPost(id);
 
