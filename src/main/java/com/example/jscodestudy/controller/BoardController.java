@@ -2,6 +2,11 @@ package com.example.jscodestudy.controller;
 
 import com.example.jscodestudy.dto.BoardDto;
 import com.example.jscodestudy.service.BoardService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,11 +23,9 @@ public class BoardController {
     }
 
     @GetMapping("/")
-    public String list(Model model, @RequestParam(value="page", defaultValue = "1") Integer pageNum) {
-        List<BoardDto> boardDtoList = boardService.getBoardlist(pageNum);
-        Integer[] pageList = boardService.getPageList(pageNum);
-
-        model.addAttribute("pageList", pageList);
+    public String list(@PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+        Pageable limitedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("createdDate").descending());
+        List<BoardDto> boardDtoList = boardService.getList(limitedPageable);
         model.addAttribute("boardList", boardDtoList);
         return "board/list.html";
     }
@@ -38,7 +41,7 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @RequestMapping(value = "/post/{no}", method={RequestMethod.GET})
+    @RequestMapping(value = "/post/{no}", method = {RequestMethod.GET}) //@GetMapping 오류
     public String detail(@PathVariable("no") Long id, Model model) {
         BoardDto boardDto = boardService.getPost(id);
 
@@ -55,7 +58,7 @@ public class BoardController {
     }
 
     @PutMapping("/post/edit/{no}")
-    public String update(BoardDto boardDto){
+    public String update(BoardDto boardDto) {
         boardService.savePost(boardDto);
         return "redirect:/";
     }
@@ -68,10 +71,11 @@ public class BoardController {
     }
 
     @GetMapping("/board/search")
-    public String search(@RequestParam(value = "keyword") String keyword, Model model) {
-        List<BoardDto> boardDtoList = boardService.searchPosts(keyword);
-        model.addAttribute("boardList", boardDtoList);
+    public String search(@RequestParam(value = "keyword") String keyword, @PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+        Page<BoardDto> boardDtoList = boardService.searchPosts(keyword, pageable);
+        model.addAttribute("boardList", boardDtoList.getContent());
 
         return "board/list.html";
     }
 }
+
