@@ -6,9 +6,6 @@ import com.example.jscodestudy.repository.BoardRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -66,6 +63,12 @@ public class BoardService {
                 .writer(board.getWriter())
                 .createDate(board.getCreatedDate())
                 .build();
+
+    //Board board = boardRepository.findById(id)
+    //            .orElseThrow(() -> new IllegalArgumentException("Invalid post ID"));
+    //
+    //    return convertEntityToDto(board);
+    //}
 
         return boardDto;
     }

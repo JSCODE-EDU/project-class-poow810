@@ -2,19 +2,15 @@ package com.example.jscodestudy.controller;
 
 import com.example.jscodestudy.dto.BoardDto;
 import com.example.jscodestudy.service.BoardService;
-import jakarta.persistence.criteria.Order;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @Controller
 public class BoardController {
