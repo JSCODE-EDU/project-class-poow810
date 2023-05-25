@@ -26,26 +26,22 @@ public class BoardController {
     }
 
     @GetMapping("/")
-    public String list(@Valid Order order, Errors errors, @PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
-        List<BoardDto> boardDtoList = boardService.getList(pageable);
-        model.addAttribute("boardList", boardDtoList);
-
-        if(errors.hasErrors()){
-            return "order";
-        }
+    public String list(@Valid @PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
+        Page<BoardDto> boardDtoPage = boardService.getList(pageable);
+        model.addAttribute("boardList", boardDtoPage);
 
         return "board/list.html";
     }
 
     @GetMapping("/board/search")
     public String search(@RequestParam(value = "keyword") String keyword, @PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
-        Page<BoardDto> boardDtoList = boardService.searchPosts(keyword, pageable);
+        Page<BoardDto> boardDtoPage = boardService.searchPosts(keyword, pageable);
 
-        if (boardDtoList.isEmpty()){
+        if (boardDtoPage.isEmpty()){
             model.addAttribute("errorMessage", "No results found for the search query.");
             return "error-page";
         }
-        model.addAttribute("boardList", boardDtoList.getContent());
+        model.addAttribute("boardList", boardDtoPage.getContent());
 
         return "board/list.html";
     }
@@ -84,14 +80,13 @@ public class BoardController {
         return "redirect:/";
     }
 
-    @DeleteMapping("/post/{no}")
-    public String delete(@PathVariable("no") Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("Invalid post ID");
+    @DeleteMapping("/post/{id}")
+    public String delete(@PathVariable("id") Long id, @RequestParam(value = "byId", defaultValue = "false") boolean byId) {
+        if (byId) {
+            boardService.deletePostById(id);
+        } else {
+            boardService.deletePost(id);
         }
-
-        boardService.deletePost(id);
-
         return "redirect:/";
     }
 }

@@ -1,6 +1,5 @@
 package com.example.jscodestudy.service;
 
-import ch.qos.logback.core.spi.ErrorCodes;
 import com.example.jscodestudy.domain.Board;
 import com.example.jscodestudy.dto.BoardDto;
 import com.example.jscodestudy.repository.BoardRepository;
@@ -22,32 +21,18 @@ public class BoardService {
     }
 
     @Transactional
-    public List<BoardDto> getList(Pageable pageable) {
+    public Page<BoardDto> getList(Pageable pageable) {
         Page<Board> boards = boardRepository.findAll(pageable);
-        List<BoardDto> boardDtoList = new ArrayList<>();
-
-        for (Board board : boards.getContent()) {
-            BoardDto boardDto = BoardDto.builder()
-                    .id(board.getId())
-                    .title(board.getTitle())
-                    .content(board.getContent())
-                    .writer(board.getWriter())
-                    .createDate(board.getCreatedDate())
-                    .build();
-
-            boardDtoList.add(boardDto);
-        }
-        return boardDtoList;
+        return boards.map(this::convertEntityToDto);
     }
 
     @Transactional
     public Page<BoardDto> searchPosts(String keyword, Pageable pageable) {
-        if (keyword.trim().replaceAll("\\s+", "").length() <= 1) {
+        String trimmedKeyword = keyword.trim().replaceAll("\\s+", "");
+        if (trimmedKeyword.length() <= 1) {
             throw new IllegalArgumentException("Keyword should be more than 1 letter excluding spaces");
         }
-        Page<Board> boards = boardRepository.findByTitleContaining(keyword, pageable);
-//
-        return boards.map(this::convertEntityToDto);
+        return boardRepository.findByTitleContaining(trimmedKeyword, pageable).map(this::convertEntityToDto);
     }
 
     @Transactional
@@ -88,6 +73,16 @@ public class BoardService {
     @Transactional
     public void deletePost(Long id) {
         boardRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deletePostById(Long id) {
+        Optional<Board> boardOptional = boardRepository.findById(id);
+        if (boardOptional.isPresent()) {
+            boardRepository.delete(boardOptional.get());
+        } else {
+            throw new IllegalArgumentException("Post not found with ID: " + id);
+        }
     }
 
 }
