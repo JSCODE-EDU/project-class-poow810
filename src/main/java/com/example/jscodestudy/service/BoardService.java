@@ -42,11 +42,11 @@ public class BoardService {
 
     @Transactional
     public Page<BoardDto> searchPosts(String keyword, Pageable pageable) {
+        if (keyword.trim().replaceAll("\\s+", "").length() <= 1) {
+            throw new IllegalArgumentException("Keyword should be more than 1 letter excluding spaces");
+        }
         Page<Board> boards = boardRepository.findByTitleContaining(keyword, pageable);
-//        if (boards.isEmpty()){
-//            throw new
-//        }
-
+//
         return boards.map(this::convertEntityToDto);
     }
 

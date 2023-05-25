@@ -40,6 +40,11 @@ public class BoardController {
     @GetMapping("/board/search")
     public String search(@RequestParam(value = "keyword") String keyword, @PageableDefault(size = 100, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable, Model model) {
         Page<BoardDto> boardDtoList = boardService.searchPosts(keyword, pageable);
+
+        if (boardDtoList.isEmpty()){
+            model.addAttribute("errorMessage", "No results found for the search query.");
+            return "error-page";
+        }
         model.addAttribute("boardList", boardDtoList.getContent());
 
         return "board/list.html";
@@ -81,6 +86,10 @@ public class BoardController {
 
     @DeleteMapping("/post/{no}")
     public String delete(@PathVariable("no") Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Invalid post ID");
+        }
+
         boardService.deletePost(id);
 
         return "redirect:/";
